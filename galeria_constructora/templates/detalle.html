@@ -11,7 +11,7 @@
     <header>
         <h1>🏗️ {{ proyecto.nombre }}</h1>
         <nav>
-            <a href="{{ url_for('home') }}">🏠 Volver a la Galería</a>
+            <a href="{{ url_for('home') }}">🏠 Volver a Proyectos</a>
             <a href="{{ url_for('editar', id=proyecto.id) }}" class="btn-header">✏️ Editar Proyecto</a>
         </nav>
     </header>
@@ -20,11 +20,21 @@
         <!-- Header del proyecto -->
         <div class="detalle-header">
             <h1>{{ proyecto.nombre }}</h1>
+            
+            <div class="proyecto-info-principal">
+                {% if proyecto.get('ubicacion') %}
+                    <p class="info-item"><span>📍</span> <strong>Ubicación:</strong> {{ proyecto.ubicacion }}</p>
+                {% endif %}
+                {% if proyecto.get('cliente') %}
+                    <p class="info-item"><span>👤</span> <strong>Cliente:</strong> {{ proyecto.cliente }}</p>
+                {% endif %}
+            </div>
+
             <div class="detalle-stats">
                 {% if proyecto.get('fecha_agregado') %}
                     <div class="stat-item">
                         <span>📅</span>
-                        <strong>Fecha:</strong> {{ proyecto.fecha_agregado }}
+                        <strong>Fecha:</strong> {{ proyecto.fecha_agregado.split(' ')[0] }}
                     </div>
                 {% endif %}
                 <div class="stat-item">
@@ -32,88 +42,112 @@
                     <strong>Vistas:</strong> {{ proyecto.vistas }}
                 </div>
                 <div class="stat-item">
-                    <span>
-                        {% if proyecto.imagen.endswith('.mp4') or proyecto.imagen.endswith('.mov') or proyecto.imagen.endswith('.webm') %}
-                            🎥
-                        {% else %}
-                            📸
-                        {% endif %}
-                    </span>
-                    <strong>Tipo:</strong> 
-                    {% if proyecto.imagen.endswith('.mp4') or proyecto.imagen.endswith('.mov') or proyecto.imagen.endswith('.webm') %}
-                        Video
-                    {% else %}
-                        Imagen
-                    {% endif %}
+                    <span>📁</span>
+                    <strong>Archivos:</strong> {{ proyecto.media|length }}
+                </div>
+                <div class="stat-item">
+                    <span>📸</span>
+                    <strong>Imágenes:</strong> {{ imagenes|length }}
+                </div>
+                <div class="stat-item">
+                    <span>🎥</span>
+                    <strong>Videos:</strong> {{ videos|length }}
                 </div>
             </div>
         </div>
 
-        <!-- Media (imagen o video) -->
-        <div class="detalle-media">
-            {% if proyecto.imagen.endswith('.mp4') or proyecto.imagen.endswith('.mov') or proyecto.imagen.endswith('.webm') %}
-                <video id="preview" controls>
-                    <source src="{{ proyecto.imagen }}" type="video/mp4">
-                    Tu navegador no soporta video HTML5.
-                </video>
-            {% else %}
-                <img id="preview" src="{{ proyecto.imagen }}" alt="{{ proyecto.nombre }}">
-            {% endif %}
-        </div>
-
-        <!-- Contenido -->
+        <!-- Descripción -->
         <div class="detalle-content">
             <h2>📋 Descripción del Proyecto</h2>
             <p>{{ proyecto.descripcion }}</p>
-            
-            {% if proyecto.get('media') and proyecto.media|length > 0 %}
-                <h2 style="margin-top: 2rem;">🖼️ Galería Adicional</h2>
-                <div class="galeria-mini">
-                    {% for item in proyecto.media %}
-                        <img src="{{ item }}" alt="Imagen adicional" style="max-width: 200px; margin: 0.5rem; border-radius: 8px;">
-                    {% endfor %}
-                </div>
-            {% endif %}
         </div>
+
+        <!-- Galería de Imágenes -->
+        {% if imagenes %}
+        <div class="galeria-seccion">
+            <h2 class="seccion-titulo">
+                <span>📸</span> Imágenes del Proyecto ({{ imagenes|length }})
+            </h2>
+            <div class="galeria-grid">
+                {% for media in imagenes %}
+                    <div class="galeria-item" onclick="abrirModal('{{ media.url }}', 'imagen')">
+                        <img src="{{ media.url }}" alt="{{ proyecto.nombre }}" loading="lazy">
+                        <div class="galeria-overlay">
+                            <span class="zoom-icon">🔍</span>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Galería de Videos -->
+        {% if videos %}
+        <div class="galeria-seccion">
+            <h2 class="seccion-titulo">
+                <span>🎥</span> Videos del Proyecto ({{ videos|length }})
+            </h2>
+            <div class="galeria-grid videos-grid">
+                {% for media in videos %}
+                    <div class="galeria-item video-item">
+                        <video controls>
+                            <source src="{{ media.url }}" type="video/mp4">
+                            Tu navegador no soporta video HTML5.
+                        </video>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Si no hay archivos -->
+        {% if not imagenes and not videos %}
+        <div class="empty-state" style="margin-top: 2rem;">
+            <div class="empty-icon">📁</div>
+            <h3>No hay archivos en este proyecto</h3>
+            <p>Agrega imágenes o videos editando el proyecto</p>
+            <a href="{{ url_for('editar', id=proyecto.id) }}" class="btn btn-editar" style="display: inline-flex; margin-top: 1rem;">
+                <span>✏️ Agregar Archivos</span>
+            </a>
+        </div>
+        {% endif %}
 
         <!-- Acciones rápidas -->
         <div class="detalle-actions">
             <a href="{{ url_for('editar', id=proyecto.id) }}" class="btn btn-editar">
                 <span>✏️ Editar Proyecto</span>
             </a>
-            <form action="{{ url_for('eliminar', id=proyecto.id) }}" method="post" style="display: inline;" onsubmit="return confirm('¿Estás seguro de eliminar este proyecto? Esta acción no se puede deshacer.');">
+            <form action="{{ url_for('eliminar', id=proyecto.id) }}" method="post" style="display: inline;" onsubmit="return confirm('¿Estás seguro de eliminar este proyecto y todos sus archivos? Esta acción no se puede deshacer.');">
                 <button type="submit" class="btn btn-eliminar">
                     <span>🗑️ Eliminar Proyecto</span>
                 </button>
             </form>
             <a href="{{ url_for('home') }}" class="btn btn-ver">
-                <span>🏠 Volver a la Galería</span>
+                <span>🏠 Volver a Proyectos</span>
             </a>
         </div>
     </main>
 
-    <!-- Modal para ampliar -->
+    <!-- Modal para ampliar imágenes -->
     <div id="modal" class="modal">
         <span class="close">&times;</span>
         <div id="modal-content" class="modal-content"></div>
     </div>
 
     <script>
-        const preview = document.getElementById("preview");
         const modal = document.getElementById("modal");
         const modalContent = document.getElementById("modal-content");
         const closeBtn = document.querySelector(".close");
 
-        // Abrir modal al hacer click
-        preview.addEventListener("click", () => {
+        // Función para abrir modal
+        function abrirModal(url, tipo) {
             modal.style.display = "flex";
-            if (preview.tagName === "VIDEO") {
-                const videoSrc = preview.querySelector('source').src;
-                modalContent.innerHTML = `<video controls autoplay src="${videoSrc}"></video>`;
+            if (tipo === 'video') {
+                modalContent.innerHTML = `<video controls autoplay src="${url}"></video>`;
             } else {
-                modalContent.innerHTML = `<img src="${preview.src}" alt="Vista ampliada">`;
+                modalContent.innerHTML = `<img src="${url}" alt="Vista ampliada">`;
             }
-        });
+        }
 
         // Cerrar modal
         closeBtn.addEventListener("click", () => {
@@ -134,6 +168,22 @@
             if (e.key === "Escape" && modal.style.display === "flex") {
                 modal.style.display = "none";
                 modalContent.innerHTML = "";
+            }
+        });
+
+        // Navegación con teclado en la galería
+        let currentImageIndex = 0;
+        const imagenes = {{ imagenes|tojson }};
+
+        document.addEventListener("keydown", (e) => {
+            if (modal.style.display === "flex" && imagenes.length > 0) {
+                if (e.key === "ArrowRight") {
+                    currentImageIndex = (currentImageIndex + 1) % imagenes.length;
+                    abrirModal(imagenes[currentImageIndex].url, 'imagen');
+                } else if (e.key === "ArrowLeft") {
+                    currentImageIndex = (currentImageIndex - 1 + imagenes.length) % imagenes.length;
+                    abrirModal(imagenes[currentImageIndex].url, 'imagen');
+                }
             }
         });
     </script>

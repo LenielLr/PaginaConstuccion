@@ -16,5 +16,25 @@
         "fecha_agregado": "2025-10-14 23:21:04",
         "vistas": 1,
         "media": []
+    },
+    {
+        "id": 3,
+        "nombre": "Anime solo leveling",
+        "descripcion": "Pelea contra la hormiga",
+        "imagen": "/static/uploads/Screen_Recording_2025-09-23_182645.mp4",
+        "fecha_agregado": "2025-10-14 23:28:46",
+        "vistas": 1,
+        "media": []
+    },
+    {
+        "id": 4,
+        "nombre": "Animer solo leveling",
+        "descripcion": "Pelea contra hormiga 2",
+        "imagen": "/static/uploads/Screen_Recording_2025-09-23_183051.mp4",
+        "fecha_agregado": "2025-10-14 23:30:25",
+        "vistas": 6,
+        "media": [],
+        "ubicacion": "",
+        "cliente": ""
     }
 ]

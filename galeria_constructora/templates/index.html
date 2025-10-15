@@ -28,34 +28,39 @@
         {% if proyectos %}
             <!-- Buscador -->
             <div class="search-container">
-                <input type="text" id="buscador" placeholder="Buscar proyectos...">
+                <input type="text" id="buscador" placeholder="Buscar proyectos por nombre, descripción, ubicación o cliente...">
             </div>
 
             <div class="galeria">
                 {% for proyecto in proyectos %}
-                    <div class="card tarjeta">
-                        <!-- Imagen o video -->
+                    <div class="card tarjeta" data-proyecto="{{ proyecto.nombre|lower }} {{ proyecto.descripcion|lower }} {{ proyecto.get('ubicacion', '')|lower }} {{ proyecto.get('cliente', '')|lower }}">
+                        <!-- Imagen de portada -->
                         <a href="{{ url_for('ver_proyecto', proyecto_id=proyecto.id) }}" class="card-media">
-                            {% if proyecto.imagen.endswith('.mp4') or proyecto.imagen.endswith('.mov') or proyecto.imagen.endswith('.webm') %}
-                                <video src="{{ proyecto.imagen }}" muted loop onmouseover="this.play()" onmouseout="this.pause()"></video>
-                                <span class="media-overlay">🎥</span>
+                            {% if proyecto.portada.endswith('.mp4') or proyecto.portada.endswith('.mov') or proyecto.portada.endswith('.webm') %}
+                                <video src="{{ proyecto.portada }}" muted loop onmouseover="this.play()" onmouseout="this.pause()"></video>
                             {% else %}
-                                <img src="{{ proyecto.imagen }}" alt="{{ proyecto.nombre }}" loading="lazy">
-                                <span class="media-overlay">📸</span>
+                                <img src="{{ proyecto.portada }}" alt="{{ proyecto.nombre }}" loading="lazy">
                             {% endif %}
+                            
+                            <!-- Badge con cantidad de archivos -->
+                            <span class="media-count">
+                                📁 {{ proyecto.total_media }} archivo{% if proyecto.total_media != 1 %}s{% endif %}
+                            </span>
                         </a>
 
                         <!-- Contenido -->
                         <div class="card-content">
-                            <h3>
-                                {{ proyecto.nombre }}
-                                {% if proyecto.imagen.endswith('.mp4') or proyecto.imagen.endswith('.mov') or proyecto.imagen.endswith('.webm') %}
-                                    <span class="badge badge-video">Video</span>
-                                {% else %}
-                                    <span class="badge badge-imagen">Imagen</span>
-                                {% endif %}
-                            </h3>
-                            <p>{{ proyecto.descripcion[:120] }}{% if proyecto.descripcion|length > 120 %}...{% endif %}</p>
+                            <h3>{{ proyecto.nombre }}</h3>
+                            
+                            {% if proyecto.get('ubicacion') %}
+                                <p class="proyecto-ubicacion">📍 {{ proyecto.ubicacion }}</p>
+                            {% endif %}
+                            
+                            {% if proyecto.get('cliente') %}
+                                <p class="proyecto-cliente">👤 Cliente: {{ proyecto.cliente }}</p>
+                            {% endif %}
+                            
+                            <p class="proyecto-descripcion">{{ proyecto.descripcion[:150] }}{% if proyecto.descripcion|length > 150 %}...{% endif %}</p>
                         </div>
 
                         <!-- Metadatos -->
@@ -64,21 +69,26 @@
                                 <span>📅 {{ proyecto.fecha_agregado.split(' ')[0] }}</span>
                             {% endif %}
                             {% if proyecto.get('vistas') %}
-                                <span>👁️ {{ proyecto.vistas }} vista{% if proyecto.vistas != 1 %}s{% endif %}</span>
+                                <span>👁️ {{ proyecto.vistas }}</span>
                             {% endif %}
+                            <span>
+                                {% set imagenes_count = proyecto.media|selectattr('tipo', 'equalto', 'imagen')|list|length %}
+                                {% set videos_count = proyecto.media|selectattr('tipo', 'equalto', 'video')|list|length %}
+                                📸 {{ imagenes_count }} | 🎥 {{ videos_count }}
+                            </span>
                         </div>
 
                         <!-- Acciones -->
                         <div class="card-actions">
                             <a href="{{ url_for('ver_proyecto', proyecto_id=proyecto.id) }}" class="btn btn-ver">
-                                <span>👁️ Ver Detalles</span>
+                                <span>👁️ Ver Proyecto</span>
                             </a>
                             <a href="{{ url_for('editar', id=proyecto.id) }}" class="btn btn-editar">
                                 <span>✏️ Editar</span>
                             </a>
-                            <form action="{{ url_for('eliminar', id=proyecto.id) }}" method="post" style="flex: 1;" onsubmit="return confirm('¿Estás seguro de eliminar este proyecto?');">
+                            <form action="{{ url_for('eliminar', id=proyecto.id) }}" method="post" style="flex: 1;" onsubmit="return confirm('¿Estás seguro de eliminar este proyecto y todos sus archivos?');">
                                 <button type="submit" class="btn btn-eliminar" style="width: 100%;">
-                                    <span>🗑️ Eliminar</span>
+                                    <span>🗑️</span>
                                 </button>
                             </form>
                         </div>
@@ -89,9 +99,9 @@
             <div class="empty-state">
                 <div class="empty-icon">📁</div>
                 <h3>No hay proyectos aún</h3>
-                <p>Comienza agregando tu primer proyecto a la galería</p>
+                <p>Comienza creando tu primer proyecto con imágenes y videos</p>
                 <a href="{{ url_for('agregar') }}" class="btn btn-ver" style="display: inline-flex; margin-top: 1rem;">
-                    <span>➕ Agregar Proyecto</span>
+                    <span>➕ Crear Proyecto</span>
                 </a>
             </div>
         {% endif %}

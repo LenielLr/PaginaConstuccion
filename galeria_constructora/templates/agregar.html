@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agregar Proyecto - Constructora Premium</title>
+    <title>Crear Proyecto - Constructora Premium</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏗️</text></svg>">
 </head>
+
 <body>
     <header>
-        <h1>➕ Agregar Nuevo Proyecto</h1>
+        <h1>➕ Crear Nuevo Proyecto</h1>
         <nav>
-            <a href="{{ url_for('home') }}">🏠 Volver a la Galería</a>
+            <a href="{{ url_for('home') }}">🏠 Volver a Proyectos</a>
         </nav>
     </header>
 
@@ -20,7 +21,7 @@
             <div class="form-header">
                 <h2>📝 Información del Proyecto</h2>
                 <p style="color: var(--text-secondary); font-size: 0.95rem; margin-top: 0.5rem;">
-                    Completa los datos del proyecto para agregarlo a la galería
+                    Completa los datos y agrega todas las imágenes y videos del proyecto
                 </p>
             </div>
 
@@ -30,7 +31,7 @@
                     Nombre del Proyecto
                     <span class="required">*</span>
                 </label>
-                <input type="text" id="nombre" name="nombre" placeholder="Ej: Torre Residencial Vista Mar" required>
+                <input type="text" id="nombre" name="nombre" placeholder="Ej: Edificio Residencial Plaza Mayor" required>
             </div>
 
             <div class="form-group">
@@ -39,44 +40,56 @@
                     Descripción
                     <span class="required">*</span>
                 </label>
-                <textarea id="descripcion" name="descripcion" rows="5" placeholder="Describe el proyecto, características principales, ubicación, etc." required></textarea>
-                <small class="form-hint">Mínimo 20 caracteres recomendado</small>
+                <textarea id="descripcion" name="descripcion" rows="5" placeholder="Describe el proyecto: características, materiales, área construida, etc." required></textarea>
+                <small class="form-hint">Proporciona una descripción detallada del proyecto</small>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="ubicacion">
+                        <span class="label-icon">📍</span>
+                        Ubicación
+                        <span class="optional">(Opcional)</span>
+                    </label>
+                    <input type="text" id="ubicacion" name="ubicacion" placeholder="Ej: Av. Principal 123, Ciudad">
+                </div>
+
+                <div class="form-group">
+                    <label for="cliente">
+                        <span class="label-icon">👤</span>
+                        Cliente
+                        <span class="optional">(Opcional)</span>
+                    </label>
+                    <input type="text" id="cliente" name="cliente" placeholder="Ej: Inmobiliaria XYZ">
+                </div>
             </div>
 
             <div class="form-divider">
-                <span>Agregar Imagen o Video</span>
+                <span>Agregar Imágenes y Videos</span>
             </div>
 
             <div class="form-group">
-                <label for="imagen_url">
-                    <span class="label-icon">🔗</span>
-                    URL de Imagen/Video
-                    <span class="optional">(Opcional)</span>
-                </label>
-                <input type="url" id="imagen_url" name="imagen_url" placeholder="https://ejemplo.com/imagen.jpg">
-                <small class="form-hint">Pega el enlace de una imagen o video desde internet</small>
-            </div>
-
-            <div class="form-or">
-                <span>O</span>
-            </div>
-
-            <div class="form-group">
-                <label for="imagen_file">
+                <label for="archivos">
                     <span class="label-icon">📤</span>
-                    Subir Archivo
-                    <span class="optional">(Opcional)</span>
+                    Subir Archivos Múltiples
+                    <span class="required">*</span>
                 </label>
                 <div class="file-input-wrapper">
-                    <input type="file" id="imagen_file" name="imagen_file" accept="image/*,video/*">
+                    <input type="file" id="archivos" name="archivos" accept="image/*,video/*" multiple required>
                     <div class="file-input-display">
                         <span class="file-icon">📁</span>
-                        <span class="file-text">Selecciona una imagen o video</span>
+                        <span class="file-text">Selecciona imágenes y/o videos (múltiples archivos)</span>
                         <span class="file-button">Explorar</span>
                     </div>
                 </div>
-                <small class="form-hint">Formatos: JPG, PNG, GIF, MP4, MOV, WEBM - Máximo 50MB</small>
+                <small class="form-hint">
+                    💡 Puedes seleccionar múltiples archivos manteniendo presionado Ctrl (Windows) o Cmd (Mac)<br>
+                    📸 Formatos de imagen: JPG, PNG, GIF<br>
+                    🎥 Formatos de video: MP4, MOV, WEBM
+                </small>
             </div>
+
+            <div id="preview-container" class="preview-container"></div>
 
             <div class="form-actions">
                 <button type="submit" class="btn-submit">
@@ -90,47 +103,34 @@
     </main>
 
     <script>
-        // Preview del archivo seleccionado
-        const fileInput = document.getElementById('imagen_file');
+        // Mostrar lista o miniaturas de los archivos seleccionados
+        const fileInput = document.getElementById('archivos');
         const fileText = document.querySelector('.file-text');
-        const fileIcon = document.querySelector('.file-icon');
+        const previewContainer = document.getElementById('preview-container');
 
-        fileInput.addEventListener('change', function(e) {
-            if (this.files && this.files[0]) {
-                const file = this.files[0];
-                const fileName = file.name;
-                const fileSize = (file.size / 1024 / 1024).toFixed(2);
-                
-                // Cambiar icono según tipo
-                if (file.type.startsWith('video/')) {
-                    fileIcon.textContent = '🎥';
-                } else if (file.type.startsWith('image/')) {
-                    fileIcon.textContent = '🖼️';
+        fileInput.addEventListener('change', function() {
+            const files = this.files;
+            previewContainer.innerHTML = ""; // Limpiar previos
+
+            if (files.length > 0) {
+                let fileNames = [];
+                for (const file of files) {
+                    fileNames.push(file.name);
+
+                    const fileType = file.type.split('/')[0];
+                    const fileURL = URL.createObjectURL(file);
+                    const preview = document.createElement(fileType === 'video' ? 'video' : 'img');
+
+                    preview.src = fileURL;
+                    preview.classList.add('preview-item');
+                    if (fileType === 'video') preview.controls = true;
+
+                    previewContainer.appendChild(preview);
                 }
-                
-                fileText.textContent = `${fileName} (${fileSize} MB)`;
-            } else {
-                fileIcon.textContent = '📁';
-                fileText.textContent = 'Selecciona una imagen o video';
-            }
-        });
 
-        // Validación del formulario
-        const form = document.querySelector('.formulario');
-        form.addEventListener('submit', function(e) {
-            const nombre = document.getElementById('nombre').value.trim();
-            const descripcion = document.getElementById('descripcion').value.trim();
-            
-            if (nombre.length < 3) {
-                e.preventDefault();
-                alert('El nombre del proyecto debe tener al menos 3 caracteres');
-                return false;
-            }
-            
-            if (descripcion.length < 20) {
-                e.preventDefault();
-                alert('La descripción debe tener al menos 20 caracteres');
-                return false;
+                fileText.textContent = `${fileNames.length} archivo(s) seleccionado(s)`;
+            } else {
+                fileText.textContent = 'Selecciona imágenes y/o videos (múltiples archivos)';
             }
         });
     </script>
