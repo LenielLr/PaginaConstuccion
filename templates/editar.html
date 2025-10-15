@@ -63,7 +63,7 @@
                         {% endif %}
                         <div class="media-item-actions">
                             <span class="media-item-info">{{ media.tipo|upper }} - {{ media.nombre[:20] }}{% if media.nombre|length > 20 %}...{% endif %}</span>
-                            +<button type="button" class="btn-delete-media" onclick="eliminarMedia('{{ url_for('eliminar_media', 'proyecto_id=proyecto.id', 'media_index=loop.index0') }}')">🗑️</button>
+                            <button type="button" class="btn-delete-media" onclick="eliminarMedia('{{ url_for(eliminar_media, proyecto_id=proyecto.id, media_index=loop.index0) }}')">🗑️</button>
                         </div>
                     </div>
                     {% endfor %}

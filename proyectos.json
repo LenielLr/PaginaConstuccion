@@ -1,1 +1,19 @@
-[]
+[
+    {
+        "id": 2,
+        "nombre": "dfsdfs",
+        "descripcion": "Una \"oración\" puede referirse a una unidad gramatical que expresa una idea completa, o a una plegaria dirigida a",
+        "ubicacion": "",
+        "cliente": "",
+        "media": [
+            {
+                "url": "/static/uploads/20251015_130430_894692_Screenshot_2025-03-14_102747.png",
+                "tipo": "imagen",
+                "nombre": "Screenshot 2025-03-14 102747.png",
+                "fecha_subida": "2025-10-15 13:04:30"
+            }
+        ],
+        "fecha_agregado": "2025-10-15 13:04:30",
+        "vistas": 2
+    }
+]
