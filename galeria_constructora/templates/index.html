@@ -3,45 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ titulo }}</title>
+    <title>{{ titulo }} - Constructora Premium</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏗️</text></svg>">
 </head>
 <body>
     <header>
-        <h1>{{ titulo }}</h1>
+        <h1>🏗️ Constructora Premium</h1>
         <nav>
-            <a href="{{ url_for('home') }}">🏠 Todo</a>
-            <a href="{{ url_for('solo_imagenes') }}">📸 Imágenes</a>
-            <a href="{{ url_for('solo_videos') }}">🎥 Videos</a>
-            <a href="{{ url_for('recientes') }}">🆕 Recientes</a>
-            <a href="{{ url_for('agregar') }}">➕ Agregar</a>
+            <a href="{{ url_for('home') }}" {% if request.path == '/' %}class="active"{% endif %}>🏠 Todos</a>
+            <a href="{{ url_for('solo_imagenes') }}" {% if request.path == '/imagenes' %}class="active"{% endif %}>📸 Imágenes</a>
+            <a href="{{ url_for('solo_videos') }}" {% if request.path == '/videos' %}class="active"{% endif %}>🎥 Videos</a>
+            <a href="{{ url_for('recientes') }}" {% if request.path == '/recientes' %}class="active"{% endif %}>🆕 Recientes</a>
+            <a href="{{ url_for('agregar') }}" class="btn-header">➕ Nuevo Proyecto</a>
         </nav>
     </header>
 
     <main>
+        <div class="page-title">
+            <h2>{{ titulo }}</h2>
+            <p class="subtitle">{{ proyectos|length }} proyecto{% if proyectos|length != 1 %}s{% endif %} disponible{% if proyectos|length != 1 %}s{% endif %}</p>
+        </div>
+
         {% if proyectos %}
+            <!-- Buscador -->
+            <div class="search-container">
+                <input type="text" id="buscador" placeholder="Buscar proyectos...">
+            </div>
+
             <div class="galeria">
                 {% for proyecto in proyectos %}
-                    <div class="card">
-                        <a href="{{ url_for('ver_proyecto', proyecto_id=proyecto.id) }}">
+                    <div class="card tarjeta">
+                        <!-- Imagen o video -->
+                        <a href="{{ url_for('ver_proyecto', proyecto_id=proyecto.id) }}" class="card-media">
                             {% if proyecto.imagen.endswith('.mp4') or proyecto.imagen.endswith('.mov') or proyecto.imagen.endswith('.webm') %}
-                                <video src="{{ proyecto.imagen }}" controls></video>
+                                <video src="{{ proyecto.imagen }}" muted loop onmouseover="this.play()" onmouseout="this.pause()"></video>
+                                <span class="media-overlay">🎥</span>
                             {% else %}
-                                <img src="{{ proyecto.imagen }}" alt="{{ proyecto.nombre }}">
+                                <img src="{{ proyecto.imagen }}" alt="{{ proyecto.nombre }}" loading="lazy">
+                                <span class="media-overlay">📸</span>
                             {% endif %}
                         </a>
-                        <h3>{{ proyecto.nombre }}</h3>
-                        <p>{{ proyecto.descripcion[:100] }}...</p>
-                        <form action="{{ url_for('eliminar', id=proyecto.id) }}" method="post">
-                            <button type="submit" class="eliminar">🗑 Eliminar</button>
-                        </form>
-                        <a href="{{ url_for('editar', id=proyecto.id) }}" class="editar">✏️ Editar</a>
+
+                        <!-- Contenido -->
+                        <div class="card-content">
+                            <h3>
+                                {{ proyecto.nombre }}
+                                {% if proyecto.imagen.endswith('.mp4') or proyecto.imagen.endswith('.mov') or proyecto.imagen.endswith('.webm') %}
+                                    <span class="badge badge-video">Video</span>
+                                {% else %}
+                                    <span class="badge badge-imagen">Imagen</span>
+                                {% endif %}
+                            </h3>
+                            <p>{{ proyecto.descripcion[:120] }}{% if proyecto.descripcion|length > 120 %}...{% endif %}</p>
+                        </div>
+
+                        <!-- Metadatos -->
+                        <div class="card-meta">
+                            {% if proyecto.get('fecha_agregado') %}
+                                <span>📅 {{ proyecto.fecha_agregado.split(' ')[0] }}</span>
+                            {% endif %}
+                            {% if proyecto.get('vistas') %}
+                                <span>👁️ {{ proyecto.vistas }} vista{% if proyecto.vistas != 1 %}s{% endif %}</span>
+                            {% endif %}
+                        </div>
+
+                        <!-- Acciones -->
+                        <div class="card-actions">
+                            <a href="{{ url_for('ver_proyecto', proyecto_id=proyecto.id) }}" class="btn btn-ver">
+                                <span>👁️ Ver Detalles</span>
+                            </a>
+                            <a href="{{ url_for('editar', id=proyecto.id) }}" class="btn btn-editar">
+                                <span>✏️ Editar</span>
+                            </a>
+                            <form action="{{ url_for('eliminar', id=proyecto.id) }}" method="post" style="flex: 1;" onsubmit="return confirm('¿Estás seguro de eliminar este proyecto?');">
+                                <button type="submit" class="btn btn-eliminar" style="width: 100%;">
+                                    <span>🗑️ Eliminar</span>
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 {% endfor %}
             </div>
         {% else %}
-            <p>No hay proyectos aún. <a href="{{ url_for('agregar') }}">Agrega uno</a>.</p>
+            <div class="empty-state">
+                <div class="empty-icon">📁</div>
+                <h3>No hay proyectos aún</h3>
+                <p>Comienza agregando tu primer proyecto a la galería</p>
+                <a href="{{ url_for('agregar') }}" class="btn btn-ver" style="display: inline-flex; margin-top: 1rem;">
+                    <span>➕ Agregar Proyecto</span>
+                </a>
+            </div>
         {% endif %}
     </main>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>

@@ -2,31 +2,186 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Editar Proyecto</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Proyecto - Constructora Premium</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏗️</text></svg>">
 </head>
 <body>
     <header>
-        <h1>Editar Proyecto</h1>
-        <a href="/" class="btn">Volver a la galería</a>
+        <h1>✏️ Editar Proyecto</h1>
+        <nav>
+            <a href="{{ url_for('home') }}">🏠 Volver a la Galería</a>
+            <a href="{{ url_for('ver_proyecto', proyecto_id=proyecto.id) }}" class="btn-header">👁️ Ver Detalles</a>
+        </nav>
     </header>
 
     <main>
-        <form action="/editar/{{ proyecto.id }}" method="POST" enctype="multipart/form-data" class="formulario">
-            <label>Nombre:</label>
-            <input type="text" name="nombre" value="{{ proyecto.nombre }}" required>
+        <form action="{{ url_for('editar', id=proyecto.id) }}" method="POST" enctype="multipart/form-data" class="formulario">
+            <div class="form-header">
+                <h2>✏️ Editar "{{ proyecto.nombre }}"</h2>
+                <p style="color: var(--text-secondary); font-size: 0.95rem; margin-top: 0.5rem;">
+                    Modifica la información del proyecto
+                </p>
+            </div>
 
-            <label>Descripción:</label>
-            <textarea name="descripcion" required>{{ proyecto.descripcion }}</textarea>
+            <!-- Vista previa de la imagen/video actual -->
+            <div class="form-group" style="text-align: center; margin-bottom: 2rem;">
+                <label style="justify-content: center;">
+                    <span class="label-icon">🖼️</span>
+                    Imagen/Video Actual
+                </label>
+                <div style="margin-top: 1rem;">
+                    {% if proyecto.imagen.endswith('.mp4') or proyecto.imagen.endswith('.mov') or proyecto.imagen.endswith('.webm') %}
+                        <video src="{{ proyecto.imagen }}" controls style="max-width: 400px; width: 100%; border-radius: 12px; border: 1px solid var(--border);"></video>
+                    {% else %}
+                        <img src="{{ proyecto.imagen }}" alt="{{ proyecto.nombre }}" style="max-width: 400px; width: 100%; border-radius: 12px; border: 1px solid var(--border);">
+                    {% endif %}
+                </div>
+            </div>
 
-            <label>Imagen URL (opcional):</label>
-            <input type="text" name="imagen_url" value="{{ proyecto.imagen }}">
+            <div class="form-group">
+                <label for="nombre">
+                    <span class="label-icon">🏗️</span>
+                    Nombre del Proyecto
+                    <span class="required">*</span>
+                </label>
+                <input type="text" id="nombre" name="nombre" value="{{ proyecto.nombre }}" placeholder="Ej: Torre Residencial Vista Mar" required>
+            </div>
 
-            <label>O seleccionar una nueva imagen:</label>
-            <input type="file" name="imagen_file" accept="image/*">
+            <div class="form-group">
+                <label for="descripcion">
+                    <span class="label-icon">📋</span>
+                    Descripción
+                    <span class="required">*</span>
+                </label>
+                <textarea id="descripcion" name="descripcion" rows="5" placeholder="Describe el proyecto, características principales, ubicación, etc." required>{{ proyecto.descripcion }}</textarea>
+                <small class="form-hint">Mínimo 20 caracteres recomendado</small>
+            </div>
 
-            <button type="submit">Guardar Cambios</button>
+            <div class="form-divider">
+                <span>Cambiar Imagen o Video (Opcional)</span>
+            </div>
+
+            <div class="form-group">
+                <label for="imagen_url">
+                    <span class="label-icon">🔗</span>
+                    Nueva URL de Imagen/Video
+                    <span class="optional">(Opcional)</span>
+                </label>
+                <input type="url" id="imagen_url" name="imagen_url" placeholder="https://ejemplo.com/nueva-imagen.jpg" value="{{ proyecto.imagen if proyecto.imagen.startswith('http') else '' }}">
+                <small class="form-hint">Deja en blanco si no deseas cambiar la imagen</small>
+            </div>
+
+            <div class="form-or">
+                <span>O</span>
+            </div>
+
+            <div class="form-group">
+                <label for="imagen_file">
+                    <span class="label-icon">📤</span>
+                    Subir Nuevo Archivo
+                    <span class="optional">(Opcional)</span>
+                </label>
+                <div class="file-input-wrapper">
+                    <input type="file" id="imagen_file" name="imagen_file" accept="image/*,video/*">
+                    <div class="file-input-display">
+                        <span class="file-icon">📁</span>
+                        <span class="file-text">Selecciona una nueva imagen o video</span>
+                        <span class="file-button">Explorar</span>
+                    </div>
+                </div>
+                <small class="form-hint">Formatos: JPG, PNG, GIF, MP4, MOV, WEBM - Máximo 50MB</small>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-submit">
+                    <span>💾 Guardar Cambios</span>
+                </button>
+                <a href="{{ url_for('ver_proyecto', proyecto_id=proyecto.id) }}" class="btn-cancel">
+                    <span>❌ Cancelar</span>
+                </a>
+            </div>
         </form>
+
+        <!-- Sección de información adicional -->
+        <div style="max-width: 700px; margin: 2rem auto; padding: 1.5rem; background: var(--surface); border-radius: 12px; border: 1px solid var(--border);">
+            <h3 style="color: var(--primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                <span>📊</span> Información del Proyecto
+            </h3>
+            <div style="display: grid; gap: 0.75rem; color: var(--text-secondary); font-size: 0.95rem;">
+                <div style="display: flex; justify-content: space-between;">
+                    <span><strong>ID:</strong></span>
+                    <span>{{ proyecto.id }}</span>
+                </div>
+                {% if proyecto.get('fecha_agregado') %}
+                <div style="display: flex; justify-content: space-between;">
+                    <span><strong>Fecha de creación:</strong></span>
+                    <span>{{ proyecto.fecha_agregado }}</span>
+                </div>
+                {% endif %}
+                <div style="display: flex; justify-content: space-between;">
+                    <span><strong>Vistas totales:</strong></span>
+                    <span>{{ proyecto.get('vistas', 0) }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span><strong>Tipo de medio:</strong></span>
+                    <span>
+                        {% if proyecto.imagen.endswith('.mp4') or proyecto.imagen.endswith('.mov') or proyecto.imagen.endswith('.webm') %}
+                            🎥 Video
+                        {% else %}
+                            📸 Imagen
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
     </main>
+
+    <script>
+        // Preview del archivo seleccionado
+        const fileInput = document.getElementById('imagen_file');
+        const fileText = document.querySelector('.file-text');
+        const fileIcon = document.querySelector('.file-icon');
+
+        fileInput.addEventListener('change', function(e) {
+            if (this.files && this.files[0]) {
+                const file = this.files[0];
+                const fileName = file.name;
+                const fileSize = (file.size / 1024 / 1024).toFixed(2);
+                
+                // Cambiar icono según tipo
+                if (file.type.startsWith('video/')) {
+                    fileIcon.textContent = '🎥';
+                } else if (file.type.startsWith('image/')) {
+                    fileIcon.textContent = '🖼️';
+                }
+                
+                fileText.textContent = `${fileName} (${fileSize} MB)`;
+            } else {
+                fileIcon.textContent = '📁';
+                fileText.textContent = 'Selecciona una nueva imagen o video';
+            }
+        });
+
+        // Validación del formulario
+        const form = document.querySelector('.formulario');
+        form.addEventListener('submit', function(e) {
+            const nombre = document.getElementById('nombre').value.trim();
+            const descripcion = document.getElementById('descripcion').value.trim();
+            
+            if (nombre.length < 3) {
+                e.preventDefault();
+                alert('El nombre del proyecto debe tener al menos 3 caracteres');
+                return false;
+            }
+            
+            if (descripcion.length < 20) {
+                e.preventDefault();
+                alert('La descripción debe tener al menos 20 caracteres');
+                return false;
+            }
+        });
+    </script>
 </body>
 </html>
