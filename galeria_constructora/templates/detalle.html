@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ proyecto.nombre }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>{{ proyecto.nombre }}</h1>
+        <nav><a href="{{ url_for('home') }}">🏠 Volver a la galería</a></nav>
+    </header>
+
+    <main class="detalle">
+        {% if proyecto.imagen.endswith('.mp4') or proyecto.imagen.endswith('.mov') or proyecto.imagen.endswith('.webm') %}
+            <video id="preview" controls>
+                <source src="{{ proyecto.imagen }}" type="video/mp4">
+                Tu navegador no soporta video HTML5.
+            </video>
+        {% else %}
+            <img id="preview" src="{{ proyecto.imagen }}" alt="{{ proyecto.nombre }}">
+        {% endif %}
+
+        <p><strong>Descripción:</strong> {{ proyecto.descripcion }}</p>
+        <p><strong>Fecha agregado:</strong> {{ proyecto.fecha_agregado }}</p>
+        <p><strong>Vistas:</strong> {{ proyecto.vistas }}</p>
+    </main>
+
+    <!-- Modal para ampliar -->
+    <div id="modal" class="modal">
+        <span class="close">&times;</span>
+        <div id="modal-content" class="modal-content"></div>
+    </div>
+
+    <script>
+        const preview = document.getElementById("preview");
+        const modal = document.getElementById("modal");
+        const modalContent = document.getElementById("modal-content");
+        const closeBtn = document.querySelector(".close");
+
+        preview.addEventListener("click", () => {
+            modal.style.display = "flex";
+            if (preview.tagName === "VIDEO") {
+                modalContent.innerHTML = `<video controls autoplay src="${preview.querySelector('source').src}" style="border-radius:14px; max-width:90%; max-height:85%;"></video>`;
+            } else {
+                modalContent.innerHTML = `<img src="${preview.src}" style="border-radius:14px; max-width:90%; max-height:85%;">`;
+            }
+        });
+
+        closeBtn.addEventListener("click", () => {
+            modal.style.display = "none";
+            modalContent.innerHTML = "";
+        });
+
+        window.addEventListener("click", (e) => {
+            if (e.target === modal) {
+                modal.style.display = "none";
+                modalContent.innerHTML = "";
+            }
+        });
+    </script>
+</body>
+</html>

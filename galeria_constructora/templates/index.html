@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ titulo }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>{{ titulo }}</h1>
+        <nav>
+            <a href="{{ url_for('home') }}">🏠 Todo</a>
+            <a href="{{ url_for('solo_imagenes') }}">📸 Imágenes</a>
+            <a href="{{ url_for('solo_videos') }}">🎥 Videos</a>
+            <a href="{{ url_for('recientes') }}">🆕 Recientes</a>
+            <a href="{{ url_for('agregar') }}">➕ Agregar</a>
+        </nav>
+    </header>
+
+    <main>
+        {% if proyectos %}
+            <div class="galeria">
+                {% for proyecto in proyectos %}
+                    <div class="card">
+                        <a href="{{ url_for('ver_proyecto', proyecto_id=proyecto.id) }}">
+                            {% if proyecto.imagen.endswith('.mp4') or proyecto.imagen.endswith('.mov') or proyecto.imagen.endswith('.webm') %}
+                                <video src="{{ proyecto.imagen }}" controls></video>
+                            {% else %}
+                                <img src="{{ proyecto.imagen }}" alt="{{ proyecto.nombre }}">
+                            {% endif %}
+                        </a>
+                        <h3>{{ proyecto.nombre }}</h3>
+                        <p>{{ proyecto.descripcion[:100] }}...</p>
+                        <form action="{{ url_for('eliminar', id=proyecto.id) }}" method="post">
+                            <button type="submit" class="eliminar">🗑 Eliminar</button>
+                        </form>
+                        <a href="{{ url_for('editar', id=proyecto.id) }}" class="editar">✏️ Editar</a>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No hay proyectos aún. <a href="{{ url_for('agregar') }}">Agrega uno</a>.</p>
+        {% endif %}
+    </main>
+</body>
+</html>

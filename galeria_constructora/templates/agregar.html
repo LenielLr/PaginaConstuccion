@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agregar Proyecto</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Agregar Proyecto</h1>
+        <nav><a href="{{ url_for('home') }}">🏠 Volver</a></nav>
+    </header>
+
+    <main>
+        <form action="{{ url_for('agregar') }}" method="POST" enctype="multipart/form-data">
+            <label>Nombre del proyecto:</label>
+            <input type="text" name="nombre" required>
+
+            <label>Descripción:</label>
+            <textarea name="descripcion" rows="4" required></textarea>
+
+            <label>URL de imagen (opcional):</label>
+            <input type="url" name="imagen_url" placeholder="https://...">
+
+            <label>O subir una imagen:</label>
+            <input type="file" name="imagen_file" accept="image/*">
+
+            <button type="submit">Guardar</button>
+        </form>
+    </main>
+</body>
+</html>

@@ -1,0 +1,24 @@
+[
+    {
+        "id": 1,
+        "nombre": "Leniel",
+        "descripcion": "asd",
+        "imagen": "/static/uploads\\Screenshot_2025-03-13_220309.png",
+        "media": [],
+        "vistas": 1
+    },
+    {
+        "id": 2,
+        "nombre": "wdas",
+        "descripcion": "sds",
+        "imagen": "/static/uploads\\Screenshot_2025-03-07_160055.png",
+        "media": []
+    },
+    {
+        "id": 3,
+        "nombre": "dsds",
+        "descripcion": "asd",
+        "imagen": "/static/uploads\\Screenshot_2025-03-14_102747.png",
+        "media": []
+    }
+]

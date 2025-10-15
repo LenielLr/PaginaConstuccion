@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Proyecto</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <header>
+        <h1>Editar Proyecto</h1>
+        <a href="/" class="btn">Volver a la galería</a>
+    </header>
+
+    <main>
+        <form action="/editar/{{ proyecto.id }}" method="POST" enctype="multipart/form-data" class="formulario">
+            <label>Nombre:</label>
+            <input type="text" name="nombre" value="{{ proyecto.nombre }}" required>
+
+            <label>Descripción:</label>
+            <textarea name="descripcion" required>{{ proyecto.descripcion }}</textarea>
+
+            <label>Imagen URL (opcional):</label>
+            <input type="text" name="imagen_url" value="{{ proyecto.imagen }}">
+
+            <label>O seleccionar una nueva imagen:</label>
+            <input type="file" name="imagen_file" accept="image/*">
+
+            <button type="submit">Guardar Cambios</button>
+        </form>
+    </main>
+</body>
+</html>

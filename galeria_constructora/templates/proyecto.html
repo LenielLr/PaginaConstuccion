@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ proyecto.nombre }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .detalle {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 1rem;
+            text-align: center;
+        }
+        .detalle img, 
+        .detalle video {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        .detalle p {
+            margin-top: 1rem;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>{{ proyecto.nombre }}</h1>
+        <nav><a href="{{ url_for('home') }}">🏠 Volver</a></nav>
+    </header>
+
+    <main class="detalle">
+        {% if proyecto.imagen.endswith('.mp4') or proyecto.imagen.endswith('.mov') or proyecto.imagen.endswith('.webm') %}
+            <video controls autoplay muted loop>
+                <source src="{{ proyecto.imagen }}" type="video/mp4">
+                Tu navegador no soporta el video.
+            </video>
+        {% else %}
+            <img src="{{ proyecto.imagen }}" alt="{{ proyecto.nombre }}">
+        {% endif %}
+
+        <p>{{ proyecto.descripcion }}</p>
+        <p><strong>📅 Fecha:</strong> {{ proyecto.fecha_agregado }}</p>
+        <p><strong>👁️ Vistas:</strong> {{ proyecto.vistas }}</p>
+    </main>
+</body>
+</html>
