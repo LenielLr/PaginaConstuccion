@@ -1,40 +1,175 @@
 [
     {
         "id": 1,
-        "nombre": "Leniel",
-        "descripcion": "New York",
-        "imagen": "/static/uploads/Screenshot_2025-03-13_220309.png",
-        "fecha_agregado": "2025-10-14 23:08:42",
-        "vistas": 1,
-        "media": []
+        "nombre": "Edificio Residencial Vista Mar",
+        "descripcion": "Moderno edificio de 15 pisos ubicado frente al mar. Cuenta con apartamentos de 2 y 3 habitaciones, áreas comunes, piscina, gimnasio y estacionamiento subterráneo. Construcción con acabados de lujo y tecnología de punta.",
+        "ubicacion": "Av. Costanera 456, Ciudad",
+        "cliente": "Inmobiliaria Costa Azul",
+        "media": [
+            {
+                "url": "https://via.placeholder.com/800x600/2c3e50/ffffff?text=Fachada+Principal",
+                "tipo": "imagen",
+                "nombre": "fachada_principal.jpg",
+                "fecha_subida": "2025-10-01 10:30:00"
+            },
+            {
+                "url": "https://via.placeholder.com/800x600/34495e/ffffff?text=Area+Comun",
+                "tipo": "imagen",
+                "nombre": "area_comun.jpg",
+                "fecha_subida": "2025-10-01 10:32:00"
+            }
+        ],
+        "fecha_agregado": "2025-10-01 10:28:15",
+        "vistas": 48
     },
     {
         "id": 2,
-        "nombre": "Cocodrile",
-        "descripcion": "conecciones\r\n",
-        "imagen": "/static/uploads/Screen_Recording_2025-04-22_204252.mp4",
-        "fecha_agregado": "2025-10-14 23:21:04",
-        "vistas": 1,
-        "media": []
+        "nombre": "Centro Comercial Plaza Norte",
+        "descripcion": "Complejo comercial de 3 niveles con más de 100 locales comerciales, área de comidas, cines y estacionamiento para 500 vehículos. Diseño moderno y funcional con sistemas de climatización eficientes.",
+        "ubicacion": "Zona Norte, Calle Principal 789",
+        "cliente": "Grupo Comercial Norte S.A.",
+        "media": [
+            {
+                "url": "https://via.placeholder.com/800x600/e74c3c/ffffff?text=Entrada+Principal",
+                "tipo": "imagen",
+                "nombre": "entrada.jpg",
+                "fecha_subida": "2025-09-15 14:20:00"
+            },
+            {
+                "url": "https://via.placeholder.com/800x600/c0392b/ffffff?text=Area+de+Locales",
+                "tipo": "imagen",
+                "nombre": "locales.jpg",
+                "fecha_subida": "2025-09-15 14:25:00"
+            }
+        ],
+        "fecha_agregado": "2025-09-15 14:18:30",
+        "vistas": 32
     },
     {
         "id": 3,
-        "nombre": "Anime solo leveling",
-        "descripcion": "Pelea contra la hormiga",
-        "imagen": "/static/uploads/Screen_Recording_2025-09-23_182645.mp4",
-        "fecha_agregado": "2025-10-14 23:28:46",
-        "vistas": 1,
-        "media": []
+        "nombre": "Conjunto Residencial Los Pinos",
+        "descripcion": "Conjunto habitacional con 50 casas unifamiliares de 2 y 3 pisos. Incluye parque infantil, canchas deportivas, casa club y seguridad 24/7. Espacios verdes y ambiente familiar.",
+        "ubicacion": "Urbanización Los Pinos, Sector Este",
+        "cliente": "Constructora Familiar Ltda.",
+        "media": [
+            {
+                "url": "https://via.placeholder.com/800x600/27ae60/ffffff?text=Casa+Modelo",
+                "tipo": "imagen",
+                "nombre": "casa_modelo.jpg",
+                "fecha_subida": "2025-08-20 09:15:00"
+            },
+            {
+                "url": "https://via.placeholder.com/800x600/229954/ffffff?text=Parque",
+                "tipo": "imagen",
+                "nombre": "parque.jpg",
+                "fecha_subida": "2025-08-20 09:18:00"
+            },
+            {
+                "url": "https://via.placeholder.com/800x600/1e8449/ffffff?text=Casa+Club",
+                "tipo": "imagen",
+                "nombre": "casa_club.jpg",
+                "fecha_subida": "2025-08-20 09:22:00"
+            },
+            {
+                "url": "https://via.placeholder.com/800x600/196f3d/ffffff?text=Zonas+Verdes",
+                "tipo": "imagen",
+                "nombre": "zonas_verdes.jpg",
+                "fecha_subida": "2025-08-20 09:25:00"
+            }
+        ],
+        "fecha_agregado": "2025-08-20 09:10:45",
+        "vistas": 68
     },
     {
         "id": 4,
-        "nombre": "Animer solo leveling",
-        "descripcion": "Pelea contra hormiga 2",
-        "imagen": "/static/uploads/Screen_Recording_2025-09-23_183051.mp4",
-        "fecha_agregado": "2025-10-14 23:30:25",
-        "vistas": 6,
-        "media": [],
+        "nombre": "Torre Corporativa BusinessHub",
+        "descripcion": "Edificio de oficinas inteligente de 20 pisos. Sistema de automatización completo, paneles solares, certificación LEED, estacionamiento de 8 niveles y helipuerto. Espacios flexibles desde 50m² hasta pisos completos.",
+        "ubicacion": "Zona Financiera, Av. Empresarial 321",
+        "cliente": "Corporación BusinessHub International",
+        "media": [
+            {
+                "url": "https://via.placeholder.com/800x600/3498db/ffffff?text=Torre+Completa",
+                "tipo": "imagen",
+                "nombre": "torre_completa.jpg",
+                "fecha_subida": "2025-07-10 16:40:00"
+            },
+            {
+                "url": "https://via.placeholder.com/800x600/2980b9/ffffff?text=Lobby+Principal",
+                "tipo": "imagen",
+                "nombre": "lobby.jpg",
+                "fecha_subida": "2025-07-10 16:45:00"
+            },
+            {
+                "url": "https://via.placeholder.com/800x600/21618c/ffffff?text=Oficinas",
+                "tipo": "imagen",
+                "nombre": "oficinas.jpg",
+                "fecha_subida": "2025-07-10 16:50:00"
+            }
+        ],
+        "fecha_agregado": "2025-07-10 16:35:20",
+        "vistas": 89
+    },
+    {
+        "id": 5,
+        "nombre": "Remodelación Hospital Central",
+        "descripcion": "Ampliación y modernización del Hospital Central. Nueva ala de emergencias, 3 quirófanos adicionales, área de imagenología con equipos de última generación y remodelación completa de salas de internación.",
+        "ubicacion": "Centro Médico, Av. Salud 555",
+        "cliente": "Ministerio de Salud",
+        "media": [
+            {
+                "url": "https://via.placeholder.com/800x600/9b59b6/ffffff?text=Area+Emergencias",
+                "tipo": "imagen",
+                "nombre": "emergencias.jpg",
+                "fecha_subida": "2025-06-05 11:10:00"
+            },
+            {
+                "url": "https://via.placeholder.com/800x600/8e44ad/ffffff?text=Quirofano",
+                "tipo": "imagen",
+                "nombre": "quirofano.jpg",
+                "fecha_subida": "2025-06-05 11:15:00"
+            }
+        ],
+        "fecha_agregado": "2025-06-05 11:05:30",
+        "vistas": 54
+    },
+    {
+        "id": 6,
+        "nombre": "Solo Leveling",
+        "descripcion": "Pelea coctra hormigas",
         "ubicacion": "",
-        "cliente": ""
+        "cliente": "",
+        "media": [
+            {
+                "url": "/static/uploads/20251015_010520_005218_Screen_Recording_2025-09-23_183051.mp4",
+                "tipo": "video",
+                "nombre": "Screen Recording 2025-09-23 183051.mp4",
+                "fecha_subida": "2025-10-15 01:05:20"
+            },
+            {
+                "url": "/static/uploads/20251015_012007_936852_Screenshot_2025-03-13_220309.png",
+                "tipo": "imagen",
+                "nombre": "Screenshot 2025-03-13 220309.png",
+                "fecha_subida": "2025-10-15 01:20:07"
+            }
+        ],
+        "fecha_agregado": "2025-10-15 01:05:20",
+        "vistas": 7
+    },
+    {
+        "id": 7,
+        "nombre": "Minecraft",
+        "descripcion": "Encontrando deposito de hierro",
+        "ubicacion": "Cueva de las maravillas",
+        "cliente": "Leniel",
+        "media": [
+            {
+                "url": "/static/uploads/20251015_013354_339856_Minecraft__1.19.2_-_Un_jugador_2025-01-20_20-12-01.mp4",
+                "tipo": "video",
+                "nombre": "Minecraft_ 1.19.2 - Un jugador 2025-01-20 20-12-01.mp4",
+                "fecha_subida": "2025-10-15 01:33:54"
+            }
+        ],
+        "fecha_agregado": "2025-10-15 01:33:54",
+        "vistas": 1
     }
 ]

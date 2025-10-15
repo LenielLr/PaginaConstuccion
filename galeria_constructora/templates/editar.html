@@ -6,6 +6,79 @@
     <title>Editar Proyecto - Constructora Premium</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏗️</text></svg>">
+    <style>
+        .media-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        .media-item {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            background: var(--background);
+        }
+        .media-item img,
+        .media-item video {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            display: block;
+        }
+        .media-item-actions {
+            padding: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--surface);
+        }
+        .media-item-info {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+        .btn-delete-media {
+            padding: 0.4rem 0.8rem;
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+        .btn-delete-media:hover {
+            background: var(--danger);
+            color: white;
+        }
+        .preview-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .preview-item {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        .section-divider {
+            margin: 2rem 0;
+            padding: 1rem 0;
+            border-top: 2px solid var(--border);
+        }
+        .section-title {
+            font-size: 1.3rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -13,173 +86,151 @@
         <nav>
             <a href="{{ url_for('home') }}">🏠 Volver a la Galería</a>
             <a href="{{ url_for('ver_proyecto', proyecto_id=proyecto.id) }}" class="btn-header">👁️ Ver Detalles</a>
+            {% if session.get('logged_in') %}
+                <a href="{{ url_for('logout') }}" class="btn-header" style="background: rgba(239, 68, 68, 0.2); color: var(--danger) !important;">🚪 Salir</a>
+            {% endif %}
         </nav>
     </header>
 
     <main>
-        <form action="{{ url_for('editar', id=proyecto.id) }}" method="POST" enctype="multipart/form-data" class="formulario">
+        <form id="editar-form" action="{{ url_for('editar', id=proyecto.id) }}" method="POST" enctype="multipart/form-data" class="formulario">
             <div class="form-header">
                 <h2>✏️ Editar "{{ proyecto.nombre }}"</h2>
                 <p style="color: var(--text-secondary); font-size: 0.95rem; margin-top: 0.5rem;">
-                    Modifica la información del proyecto
+                    Modifica la información del proyecto y gestiona sus archivos multimedia
                 </p>
             </div>
 
-            <!-- Vista previa de la imagen/video actual -->
-            <div class="form-group" style="text-align: center; margin-bottom: 2rem;">
-                <label style="justify-content: center;">
-                    <span class="label-icon">🖼️</span>
-                    Imagen/Video Actual
-                </label>
-                <div style="margin-top: 1rem;">
-                    {% if proyecto.imagen.endswith('.mp4') or proyecto.imagen.endswith('.mov') or proyecto.imagen.endswith('.webm') %}
-                        <video src="{{ proyecto.imagen }}" controls style="max-width: 400px; width: 100%; border-radius: 12px; border: 1px solid var(--border);"></video>
-                    {% else %}
-                        <img src="{{ proyecto.imagen }}" alt="{{ proyecto.nombre }}" style="max-width: 400px; width: 100%; border-radius: 12px; border: 1px solid var(--border);">
-                    {% endif %}
-                </div>
-            </div>
-
+            <!-- Información básica -->
             <div class="form-group">
-                <label for="nombre">
-                    <span class="label-icon">🏗️</span>
-                    Nombre del Proyecto
-                    <span class="required">*</span>
-                </label>
+                <label for="nombre"><span class="label-icon">🏗️</span> Nombre del Proyecto <span class="required">*</span></label>
                 <input type="text" id="nombre" name="nombre" value="{{ proyecto.nombre }}" placeholder="Ej: Torre Residencial Vista Mar" required>
             </div>
 
             <div class="form-group">
-                <label for="descripcion">
-                    <span class="label-icon">📋</span>
-                    Descripción
-                    <span class="required">*</span>
-                </label>
+                <label for="descripcion"><span class="label-icon">📋</span> Descripción <span class="required">*</span></label>
                 <textarea id="descripcion" name="descripcion" rows="5" placeholder="Describe el proyecto, características principales, ubicación, etc." required>{{ proyecto.descripcion }}</textarea>
-                <small class="form-hint">Mínimo 20 caracteres recomendado</small>
-            </div>
-
-            <div class="form-divider">
-                <span>Cambiar Imagen o Video (Opcional)</span>
+                <small class="form-hint">Proporciona una descripción detallada del proyecto</small>
             </div>
 
             <div class="form-group">
-                <label for="imagen_url">
-                    <span class="label-icon">🔗</span>
-                    Nueva URL de Imagen/Video
-                    <span class="optional">(Opcional)</span>
-                </label>
-                <input type="url" id="imagen_url" name="imagen_url" placeholder="https://ejemplo.com/nueva-imagen.jpg" value="{{ proyecto.imagen if proyecto.imagen.startswith('http') else '' }}">
-                <small class="form-hint">Deja en blanco si no deseas cambiar la imagen</small>
-            </div>
-
-            <div class="form-or">
-                <span>O</span>
+                <label for="ubicacion"><span class="label-icon">📍</span> Ubicación <span class="optional">(Opcional)</span></label>
+                <input type="text" id="ubicacion" name="ubicacion" value="{{ proyecto.get('ubicacion', '') }}" placeholder="Ej: Av. Principal 123, Ciudad">
             </div>
 
             <div class="form-group">
-                <label for="imagen_file">
-                    <span class="label-icon">📤</span>
-                    Subir Nuevo Archivo
-                    <span class="optional">(Opcional)</span>
-                </label>
+                <label for="cliente"><span class="label-icon">👤</span> Cliente <span class="optional">(Opcional)</span></label>
+                <input type="text" id="cliente" name="cliente" value="{{ proyecto.get('cliente', '') }}" placeholder="Ej: Inmobiliaria XYZ">
+            </div>
+
+            {% if proyecto.media and proyecto.media|length > 0 %}
+            <div class="section-divider">
+                <h3 class="section-title"><span>📁</span> Archivos Actuales ({{ proyecto.media|length }})</h3>
+                <div class="media-gallery">
+                    {% for media in proyecto.media %}
+                    <div class="media-item">
+                        {% if media.tipo == 'video' %}
+                            <video src="{{ media.url }}" muted></video>
+                        {% else %}
+                            <img src="{{ media.url }}" alt="{{ media.nombre }}">
+                        {% endif %}
+                        <div class="media-item-actions">
+                            <span class="media-item-info">{{ media.tipo|upper }} - {{ media.nombre[:20] }}{% if media.nombre|length > 20 %}...{% endif %}</span>
+                            <button type="button" class="btn-delete-media" onclick="eliminarMedia('{{ url_for('eliminar_media', proyecto_id=proyecto.id, media_index=loop.index0) }}')">🗑️</button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="form-divider"><span>Agregar Nuevos Archivos</span></div>
+
+            <div class="form-group">
+                <label for="archivos"><span class="label-icon">📤</span> Subir Nuevos Archivos <span class="optional">(Opcional)</span></label>
                 <div class="file-input-wrapper">
-                    <input type="file" id="imagen_file" name="imagen_file" accept="image/*,video/*">
+                    <input type="file" id="archivos" name="archivos" accept="image/*,video/*" multiple>
                     <div class="file-input-display">
                         <span class="file-icon">📁</span>
-                        <span class="file-text">Selecciona una nueva imagen o video</span>
+                        <span class="file-text">Selecciona imágenes y/o videos (múltiples archivos)</span>
                         <span class="file-button">Explorar</span>
                     </div>
                 </div>
-                <small class="form-hint">Formatos: JPG, PNG, GIF, MP4, MOV, WEBM - Máximo 50MB</small>
+                <small class="form-hint">
+                    💡 Puedes seleccionar múltiples archivos manteniendo presionado Ctrl (Windows) o Cmd (Mac)<br>
+                    📸 Formatos: JPG, PNG, GIF<br>
+                    🎥 Videos: MP4, MOV, WEBM, AVI
+                </small>
             </div>
 
+            <div id="preview-container" class="preview-container"></div>
+
             <div class="form-actions">
-                <button type="submit" class="btn-submit">
-                    <span>💾 Guardar Cambios</span>
-                </button>
-                <a href="{{ url_for('ver_proyecto', proyecto_id=proyecto.id) }}" class="btn-cancel">
-                    <span>❌ Cancelar</span>
-                </a>
+                <button type="submit" class="btn-submit"><span>💾 Guardar Cambios</span></button>
+                <a href="{{ url_for('ver_proyecto', proyecto_id=proyecto.id) }}" class="btn-cancel"><span>❌ Cancelar</span></a>
             </div>
         </form>
 
-        <!-- Sección de información adicional -->
+        <!-- Info adicional -->
         <div style="max-width: 700px; margin: 2rem auto; padding: 1.5rem; background: var(--surface); border-radius: 12px; border: 1px solid var(--border);">
-            <h3 style="color: var(--primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                <span>📊</span> Información del Proyecto
-            </h3>
+            <h3 style="color: var(--primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;"><span>📊</span> Información del Proyecto</h3>
             <div style="display: grid; gap: 0.75rem; color: var(--text-secondary); font-size: 0.95rem;">
-                <div style="display: flex; justify-content: space-between;">
-                    <span><strong>ID:</strong></span>
-                    <span>{{ proyecto.id }}</span>
-                </div>
+                <div style="display: flex; justify-content: space-between;"><span><strong>ID:</strong></span><span>{{ proyecto.id }}</span></div>
                 {% if proyecto.get('fecha_agregado') %}
-                <div style="display: flex; justify-content: space-between;">
-                    <span><strong>Fecha de creación:</strong></span>
-                    <span>{{ proyecto.fecha_agregado }}</span>
-                </div>
+                <div style="display: flex; justify-content: space-between;"><span><strong>Fecha:</strong></span><span>{{ proyecto.fecha_agregado }}</span></div>
                 {% endif %}
-                <div style="display: flex; justify-content: space-between;">
-                    <span><strong>Vistas totales:</strong></span>
-                    <span>{{ proyecto.get('vistas', 0) }}</span>
-                </div>
-                <div style="display: flex; justify-content: space-between;">
-                    <span><strong>Tipo de medio:</strong></span>
-                    <span>
-                        {% if proyecto.imagen.endswith('.mp4') or proyecto.imagen.endswith('.mov') or proyecto.imagen.endswith('.webm') %}
-                            🎥 Video
-                        {% else %}
-                            📸 Imagen
-                        {% endif %}
-                    </span>
-                </div>
+                <div style="display: flex; justify-content: space-between;"><span><strong>Vistas:</strong></span><span>{{ proyecto.get('vistas', 0) }}</span></div>
+                <div style="display: flex; justify-content: space-between;"><span><strong>Total archivos:</strong></span><span>{{ proyecto.media|length }}</span></div>
             </div>
         </div>
     </main>
 
     <script>
-        // Preview del archivo seleccionado
-        const fileInput = document.getElementById('imagen_file');
+        // Previsualización de archivos
+        const fileInput = document.getElementById('archivos');
         const fileText = document.querySelector('.file-text');
-        const fileIcon = document.querySelector('.file-icon');
+        const previewContainer = document.getElementById('preview-container');
 
-        fileInput.addEventListener('change', function(e) {
-            if (this.files && this.files[0]) {
-                const file = this.files[0];
-                const fileName = file.name;
-                const fileSize = (file.size / 1024 / 1024).toFixed(2);
-                
-                // Cambiar icono según tipo
-                if (file.type.startsWith('video/')) {
-                    fileIcon.textContent = '🎥';
-                } else if (file.type.startsWith('image/')) {
-                    fileIcon.textContent = '🖼️';
+        fileInput.addEventListener('change', () => {
+            const files = fileInput.files;
+            previewContainer.innerHTML = "";
+            if (files.length > 0) {
+                fileText.textContent = `${files.length} archivo(s) seleccionado(s)`;
+                for (const file of files) {
+                    const fileType = file.type.split('/')[0];
+                    const el = document.createElement(fileType === 'video' ? 'video' : 'img');
+                    el.src = URL.createObjectURL(file);
+                    el.classList.add('preview-item');
+                    if (fileType === 'video') el.controls = true;
+                    previewContainer.appendChild(el);
                 }
-                
-                fileText.textContent = `${fileName} (${fileSize} MB)`;
             } else {
-                fileIcon.textContent = '📁';
-                fileText.textContent = 'Selecciona una nueva imagen o video';
+                fileText.textContent = 'Selecciona imágenes y/o videos (múltiples archivos)';
             }
         });
 
-        // Validación del formulario
-        const form = document.querySelector('.formulario');
-        form.addEventListener('submit', function(e) {
+        // Eliminar archivo sin anidar forms
+        function eliminarMedia(url) {
+            if (confirm('¿Eliminar este archivo?')) {
+                fetch(url, { method: 'POST' })
+                    .then(res => res.ok ? location.reload() : alert('Error al eliminar archivo'))
+                    .catch(() => alert('Error de conexión'));
+            }
+        }
+
+        // Validación antes de enviar
+        document.getElementById('editar-form').addEventListener('submit', (e) => {
             const nombre = document.getElementById('nombre').value.trim();
             const descripcion = document.getElementById('descripcion').value.trim();
-            
             if (nombre.length < 3) {
                 e.preventDefault();
-                alert('El nombre del proyecto debe tener al menos 3 caracteres');
-                return false;
+                alert('❌ El nombre del proyecto debe tener al menos 3 caracteres');
+                return;
             }
-            
-            if (descripcion.length < 20) {
+            if (descripcion.length < 10) {
                 e.preventDefault();
-                alert('La descripción debe tener al menos 20 caracteres');
-                return false;
+                alert('❌ La descripción debe tener al menos 10 caracteres');
+                return;
             }
         });
     </script>

@@ -15,14 +15,25 @@
             <a href="{{ url_for('solo_imagenes') }}" {% if request.path == '/imagenes' %}class="active"{% endif %}>📸 Imágenes</a>
             <a href="{{ url_for('solo_videos') }}" {% if request.path == '/videos' %}class="active"{% endif %}>🎥 Videos</a>
             <a href="{{ url_for('recientes') }}" {% if request.path == '/recientes' %}class="active"{% endif %}>🆕 Recientes</a>
-            <a href="{{ url_for('agregar') }}" class="btn-header">➕ Nuevo Proyecto</a>
+            
+            {% if session.get('logged_in') %}
+                <a href="{{ url_for('agregar') }}" class="btn-header">➕ Nuevo Proyecto</a>
+                <a href="{{ url_for('logout') }}" class="btn-header" style="background: rgba(239, 68, 68, 0.2); color: var(--danger) !important;">🚪 Salir</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="btn-header">🔐 Admin</a>
+            {% endif %}
         </nav>
     </header>
 
     <main>
         <div class="page-title">
             <h2>{{ titulo }}</h2>
-            <p class="subtitle">{{ proyectos|length }} proyecto{% if proyectos|length != 1 %}s{% endif %} disponible{% if proyectos|length != 1 %}s{% endif %}</p>
+            <p class="subtitle">
+                {{ proyectos|length }} proyecto{% if proyectos|length != 1 %}s{% endif %} disponible{% if proyectos|length != 1 %}s{% endif %}
+                {% if session.get('logged_in') %}
+                    <span style="color: var(--success); margin-left: 1rem;">✅ Modo Administrador</span>
+                {% endif %}
+            </p>
         </div>
 
         {% if proyectos %}
@@ -83,14 +94,17 @@
                             <a href="{{ url_for('ver_proyecto', proyecto_id=proyecto.id) }}" class="btn btn-ver">
                                 <span>👁️ Ver Proyecto</span>
                             </a>
-                            <a href="{{ url_for('editar', id=proyecto.id) }}" class="btn btn-editar">
-                                <span>✏️ Editar</span>
-                            </a>
-                            <form action="{{ url_for('eliminar', id=proyecto.id) }}" method="post" style="flex: 1;" onsubmit="return confirm('¿Estás seguro de eliminar este proyecto y todos sus archivos?');">
-                                <button type="submit" class="btn btn-eliminar" style="width: 100%;">
-                                    <span>🗑️</span>
-                                </button>
-                            </form>
+                            
+                            {% if session.get('logged_in') %}
+                                <a href="{{ url_for('editar', id=proyecto.id) }}" class="btn btn-editar">
+                                    <span>✏️ Editar</span>
+                                </a>
+                                <form action="{{ url_for('eliminar', id=proyecto.id) }}" method="post" style="flex: 1;" onsubmit="return confirm('¿Estás seguro de eliminar este proyecto y todos sus archivos?');">
+                                    <button type="submit" class="btn btn-eliminar" style="width: 100%;">
+                                        <span>🗑️</span>
+                                    </button>
+                                </form>
+                            {% endif %}
                         </div>
                     </div>
                 {% endfor %}
@@ -99,10 +113,12 @@
             <div class="empty-state">
                 <div class="empty-icon">📁</div>
                 <h3>No hay proyectos aún</h3>
-                <p>Comienza creando tu primer proyecto con imágenes y videos</p>
-                <a href="{{ url_for('agregar') }}" class="btn btn-ver" style="display: inline-flex; margin-top: 1rem;">
-                    <span>➕ Crear Proyecto</span>
-                </a>
+                <p>{% if session.get('logged_in') %}Comienza creando tu primer proyecto con imágenes y videos{% else %}Próximamente encontrarás aquí nuestros proyectos{% endif %}</p>
+                {% if session.get('logged_in') %}
+                    <a href="{{ url_for('agregar') }}" class="btn btn-ver" style="display: inline-flex; margin-top: 1rem;">
+                        <span>➕ Crear Proyecto</span>
+                    </a>
+                {% endif %}
             </div>
         {% endif %}
     </main>
