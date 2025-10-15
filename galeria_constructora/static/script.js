@@ -182,6 +182,170 @@ document.addEventListener("DOMContentLoaded", () => {
         buscador.parentElement.appendChild(tooltip);
     }
 
+    // ====== MODAL PARA DETALLE DE PROYECTO ======
+    const modal = document.getElementById("modal");
+    if (modal) {
+        const modalContent = document.getElementById("modal-content");
+        const closeBtn = document.querySelector(".close");
+
+        // Función para abrir modal
+        window.abrirModal = function(url, tipo) {
+            modal.style.display = "flex";
+            if (tipo === 'video') {
+                modalContent.innerHTML = `<video controls autoplay src="${url}"></video>`;
+            } else {
+                modalContent.innerHTML = `<img src="${url}" alt="Vista ampliada">`;
+            }
+        }
+
+        // Cerrar modal
+        if (closeBtn) {
+            closeBtn.addEventListener("click", () => {
+                modal.style.display = "none";
+                modalContent.innerHTML = "";
+            });
+        }
+
+        // Cerrar al hacer click fuera
+        window.addEventListener("click", (e) => {
+            if (e.target === modal) {
+                modal.style.display = "none";
+                modalContent.innerHTML = "";
+            }
+        });
+
+        // Cerrar con tecla ESC
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape" && modal.style.display === "flex") {
+                modal.style.display = "none";
+                modalContent.innerHTML = "";
+            }
+        });
+
+        // Navegación con teclado en la galería
+        let currentImageIndex = 0;
+        const imagenes = document.querySelectorAll('.galeria-item[onclick*="imagen"]');
+        
+        if (imagenes.length > 0) {
+            document.addEventListener("keydown", (e) => {
+                if (modal.style.display === "flex" && imagenes.length > 0) {
+                    if (e.key === "ArrowRight") {
+                        currentImageIndex = (currentImageIndex + 1) % imagenes.length;
+                        const onclickAttr = imagenes[currentImageIndex].getAttribute('onclick');
+                        const urlMatch = onclickAttr.match(/abrirModal\('([^']+)'/);
+                        if (urlMatch) {
+                            abrirModal(urlMatch[1], 'imagen');
+                        }
+                    } else if (e.key === "ArrowLeft") {
+                        currentImageIndex = (currentImageIndex - 1 + imagenes.length) % imagenes.length;
+                        const onclickAttr = imagenes[currentImageIndex].getAttribute('onclick');
+                        const urlMatch = onclickAttr.match(/abrirModal\('([^']+)'/);
+                        if (urlMatch) {
+                            abrirModal(urlMatch[1], 'imagen');
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    // ====== FUNCIÓN PARA COMPARTIR ======
+    window.compartir = function() {
+        const url = window.location.href;
+        const titulo = document.querySelector('.detalle-header h1')?.textContent || "Proyecto Constructora Premium";
+        const descripcion = document.querySelector('.detalle-content p')?.textContent || "";
+        
+        if (navigator.share) {
+            navigator.share({
+                title: titulo,
+                text: descripcion.substring(0, 100),
+                url: url
+            }).catch(() => {});
+        } else {
+            // Copiar al portapapeles
+            navigator.clipboard.writeText(url).then(() => {
+                alert('✅ Enlace copiado al portapapeles');
+            });
+        }
+    }
+
+    // ====== PREVISUALIZACIÓN DE ARCHIVOS PARA AGREGAR/EDITAR ======
+    const fileInput = document.getElementById('archivos');
+    if (fileInput) {
+        const fileText = document.querySelector('.file-text');
+        const previewContainer = document.getElementById('preview-container');
+
+        fileInput.addEventListener('change', function() {
+            const files = this.files;
+            if (previewContainer) previewContainer.innerHTML = "";
+
+            if (files.length > 0) {
+                let fileNames = [];
+                for (const file of files) {
+                    fileNames.push(file.name);
+
+                    if (previewContainer) {
+                        const fileType = file.type.split('/')[0];
+                        const fileURL = URL.createObjectURL(file);
+                        const preview = document.createElement(fileType === 'video' ? 'video' : 'img');
+
+                        preview.src = fileURL;
+                        preview.classList.add('preview-item');
+                        if (fileType === 'video') preview.controls = true;
+
+                        previewContainer.appendChild(preview);
+                    }
+                }
+
+                if (fileText) fileText.textContent = `${fileNames.length} archivo(s) seleccionado(s)`;
+            } else {
+                if (fileText) fileText.textContent = 'Selecciona imágenes y/o videos (múltiples archivos)';
+            }
+        });
+    }
+
+    // ====== ELIMINAR MEDIA EN EDICIÓN ======
+    window.eliminarMedia = function(url) {
+        if (confirm('¿Eliminar este archivo?')) {
+            fetch(url, { method: 'POST' })
+                .then(res => res.ok ? location.reload() : alert('Error al eliminar archivo'))
+                .catch(() => alert('Error de conexión'));
+        }
+    }
+
+    // ====== VALIDACIÓN DE FORMULARIO DE EDICIÓN ======
+    const editarForm = document.getElementById('editar-form');
+    if (editarForm) {
+        editarForm.addEventListener('submit', (e) => {
+            const nombre = document.getElementById('nombre')?.value.trim();
+            const descripcion = document.getElementById('descripcion')?.value.trim();
+            
+            if (nombre && nombre.length < 3) {
+                e.preventDefault();
+                alert('❌ El nombre del proyecto debe tener al menos 3 caracteres');
+                return;
+            }
+            if (descripcion && descripcion.length < 10) {
+                e.preventDefault();
+                alert('❌ La descripción debe tener al menos 10 caracteres');
+                return;
+            }
+        });
+    }
+
+    // ====== ANIMACIÓN PARA LOGIN ======
+    const loginCard = document.querySelector('.login-card');
+    if (loginCard) {
+        loginCard.style.opacity = '0';
+        loginCard.style.transform = 'translateY(20px)';
+        
+        setTimeout(() => {
+            loginCard.style.transition = 'all 0.5s ease';
+            loginCard.style.opacity = '1';
+            loginCard.style.transform = 'translateY(0)';
+        }, 100);
+    }
+
     // ====== LOG DE CONSOLA ======
     console.log('%c🏗️ Constructora Premium', 'font-size: 20px; font-weight: bold; color: #d4af37;');
     console.log('%cSistema cargado correctamente ✅', 'color: #10b981;');

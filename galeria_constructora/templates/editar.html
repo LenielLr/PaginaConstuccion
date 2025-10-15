@@ -6,79 +6,6 @@
     <title>Editar Proyecto - Constructora Premium</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏗️</text></svg>">
-    <style>
-        .media-gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 1rem;
-            margin: 1.5rem 0;
-        }
-        .media-item {
-            position: relative;
-            border-radius: 8px;
-            overflow: hidden;
-            border: 1px solid var(--border);
-            background: var(--background);
-        }
-        .media-item img,
-        .media-item video {
-            width: 100%;
-            height: 150px;
-            object-fit: cover;
-            display: block;
-        }
-        .media-item-actions {
-            padding: 0.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--surface);
-        }
-        .media-item-info {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-        }
-        .btn-delete-media {
-            padding: 0.4rem 0.8rem;
-            background: rgba(239, 68, 68, 0.15);
-            color: var(--danger);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            transition: all 0.3s ease;
-        }
-        .btn-delete-media:hover {
-            background: var(--danger);
-            color: white;
-        }
-        .preview-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-        .preview-item {
-            width: 100%;
-            height: 150px;
-            object-fit: cover;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-        }
-        .section-divider {
-            margin: 2rem 0;
-            padding: 1rem 0;
-            border-top: 2px solid var(--border);
-        }
-        .section-title {
-            font-size: 1.3rem;
-            color: var(--primary);
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-    </style>
 </head>
 <body>
     <header>
@@ -185,8 +112,9 @@
         </div>
     </main>
 
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
     <script>
-        // Previsualización de archivos
+        // Script específico para la página de edición
         const fileInput = document.getElementById('archivos');
         const fileText = document.querySelector('.file-text');
         const previewContainer = document.getElementById('preview-container');

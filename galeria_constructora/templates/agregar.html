@@ -102,8 +102,9 @@
         </form>
     </main>
 
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
     <script>
-        // Mostrar lista o miniaturas de los archivos seleccionados
+        // Script específico para previsualización de archivos
         const fileInput = document.getElementById('archivos');
         const fileText = document.querySelector('.file-text');
         const previewContainer = document.getElementById('preview-container');
