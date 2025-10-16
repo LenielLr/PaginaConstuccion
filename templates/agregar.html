@@ -17,7 +17,7 @@
     </header>
 
     <main>
-        <form action="{{ url_for('agregar') }}" method="POST" enctype="multipart/form-data" class="formulario">
+        <form id="agregar-form" action="{{ url_for('agregar') }}" method="POST" enctype="multipart/form-data" class="formulario">
             <div class="form-header">
                 <h2>📝 Información del Proyecto</h2>
                 <p style="color: var(--text-secondary); font-size: 0.95rem; margin-top: 0.5rem;">
@@ -41,7 +41,7 @@
                     <span class="required">*</span>
                 </label>
                 <textarea id="descripcion" name="descripcion" rows="5" placeholder="Describe el proyecto: características, materiales, área construida, etc." required></textarea>
-                <small class="form-hint">Proporciona una descripción detallada del proyecto</small>
+                <small class="form-hint">Proporciona una descripción detallada del proyecto (mínimo 10 caracteres)</small>
             </div>
 
             <div class="form-row">
@@ -103,37 +103,5 @@
     </main>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
-    <script>
-        // Script específico para previsualización de archivos
-        const fileInput = document.getElementById('archivos');
-        const fileText = document.querySelector('.file-text');
-        const previewContainer = document.getElementById('preview-container');
-
-        fileInput.addEventListener('change', function() {
-            const files = this.files;
-            previewContainer.innerHTML = ""; // Limpiar previos
-
-            if (files.length > 0) {
-                let fileNames = [];
-                for (const file of files) {
-                    fileNames.push(file.name);
-
-                    const fileType = file.type.split('/')[0];
-                    const fileURL = URL.createObjectURL(file);
-                    const preview = document.createElement(fileType === 'video' ? 'video' : 'img');
-
-                    preview.src = fileURL;
-                    preview.classList.add('preview-item');
-                    if (fileType === 'video') preview.controls = true;
-
-                    previewContainer.appendChild(preview);
-                }
-
-                fileText.textContent = `${fileNames.length} archivo(s) seleccionado(s)`;
-            } else {
-                fileText.textContent = 'Selecciona imágenes y/o videos (múltiples archivos)';
-            }
-        });
-    </script>
 </body>
 </html>

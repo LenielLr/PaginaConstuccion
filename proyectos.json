@@ -2,7 +2,7 @@
     {
         "id": 2,
         "nombre": "dfsdfs",
-        "descripcion": "Una \"oración\" puede referirse a una unidad gramatical que expresa una idea completa, o a una plegaria dirigida a",
+        "descripcion": "Hola como estas",
         "ubicacion": "",
         "cliente": "",
         "media": [
@@ -14,6 +14,6 @@
             }
         ],
         "fecha_agregado": "2025-10-15 13:04:30",
-        "vistas": 2
+        "vistas": 4
     }
 ]

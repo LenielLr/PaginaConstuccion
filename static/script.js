@@ -355,3 +355,479 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log('  • ESC: Limpiar búsqueda');
     }
 });
+
+// ==========================================
+// SISTEMA DE VALIDACIÓN COMPLETO
+// ==========================================
+
+const ValidationSystem = {
+    // Configuración de reglas de validación
+    rules: {
+        nombre: {
+            minLength: 3,
+            maxLength: 100,
+            required: true,
+            message: 'El nombre debe tener entre 3 y 100 caracteres'
+        },
+        descripcion: {
+            minLength: 10,
+            maxLength: 1000,
+            required: true,
+            message: 'La descripción debe tener entre 10 y 1000 caracteres'
+        },
+        ubicacion: {
+            maxLength: 200,
+            required: false
+        },
+        cliente: {
+            maxLength: 100,
+            required: false
+        }
+    },
+
+    // Validar un campo específico
+    validateField(input) {
+        const fieldName = input.name || input.id;
+        const rule = this.rules[fieldName];
+        
+        if (!rule) return true;
+
+        const value = input.value.trim();
+        const errorDiv = input.parentElement.querySelector('.error-message');
+        const errorText = errorDiv ? errorDiv.querySelector('.error-text') : null;
+
+        // Campo requerido
+        if (rule.required && value.length === 0) {
+            this.showError(input, errorDiv, errorText, `Este campo es obligatorio`);
+            return false;
+        }
+
+        // Mínimo de caracteres
+        if (rule.minLength && value.length > 0 && value.length < rule.minLength) {
+            this.showError(input, errorDiv, errorText, `Mínimo ${rule.minLength} caracteres (llevas ${value.length})`);
+            return false;
+        }
+
+        // Máximo de caracteres
+        if (rule.maxLength && value.length > rule.maxLength) {
+            this.showError(input, errorDiv, errorText, `Máximo ${rule.maxLength} caracteres (tienes ${value.length})`);
+            return false;
+        }
+
+        // Campo válido
+        this.hideError(input, errorDiv);
+        return true;
+    },
+
+    // Mostrar error
+    showError(input, errorDiv, errorText, message) {
+        input.classList.add('error');
+        input.classList.remove('valid');
+        if (errorDiv && errorText) {
+            errorText.textContent = message;
+            errorDiv.classList.add('show');
+        }
+    },
+
+    // Ocultar error
+    hideError(input, errorDiv) {
+        input.classList.remove('error');
+        input.classList.add('valid');
+        if (errorDiv) {
+            errorDiv.classList.remove('show');
+        }
+    },
+
+    // Actualizar contador de caracteres
+    updateCounter(input) {
+        const fieldName = input.name || input.id;
+        const rule = this.rules[fieldName];
+        
+        if (!rule || (!rule.minLength && !rule.maxLength)) return;
+
+        const counter = input.parentElement.querySelector('.char-counter');
+        if (!counter) return;
+
+        const value = input.value.trim();
+        const length = value.length;
+        const counterText = counter.querySelector('.counter-text');
+        const counterNumbers = counter.querySelector('.counter-numbers');
+
+        // Actualizar números
+        if (counterNumbers) {
+            if (rule.maxLength) {
+                counterNumbers.textContent = `${length}/${rule.maxLength}`;
+            } else {
+                counterNumbers.textContent = `${length} caracteres`;
+            }
+        }
+
+        // Actualizar texto y color
+        counter.classList.remove('success', 'warning', 'error');
+
+        if (rule.minLength && length < rule.minLength) {
+            counter.classList.add('error');
+            if (counterText) {
+                counterText.textContent = `Faltan ${rule.minLength - length} caracteres`;
+            }
+        } else if (rule.maxLength && length > rule.maxLength * 0.9) {
+            counter.classList.add('warning');
+            if (counterText) {
+                counterText.textContent = `${rule.maxLength - length} caracteres restantes`;
+            }
+        } else if (length >= rule.minLength) {
+            counter.classList.add('success');
+            if (counterText) {
+                counterText.textContent = '✓ Correcto';
+            }
+        } else {
+            if (counterText) counterText.textContent = '';
+        }
+    },
+
+    // Inicializar validación en formulario
+    initForm(formId) {
+        const form = document.getElementById(formId);
+        if (!form) return;
+
+        // Agregar elementos de validación
+        const inputs = form.querySelectorAll('input[type="text"], textarea');
+        inputs.forEach(input => {
+            const fieldName = input.name || input.id;
+            
+            // Crear mensaje de error
+            if (!input.parentElement.querySelector('.error-message')) {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error-message';
+                errorDiv.innerHTML = '<span>⚠️</span><span class="error-text"></span>';
+                input.parentElement.appendChild(errorDiv);
+            }
+
+            // Crear contador de caracteres
+            if (this.rules[fieldName] && (this.rules[fieldName].minLength || this.rules[fieldName].maxLength)) {
+                if (!input.parentElement.querySelector('.char-counter')) {
+                    const counter = document.createElement('div');
+                    counter.className = 'char-counter';
+                    counter.innerHTML = '<span class="counter-text"></span><span class="counter-numbers"></span>';
+                    input.parentElement.appendChild(counter);
+                }
+            }
+
+            // Validar en tiempo real
+            input.addEventListener('input', () => {
+                this.validateField(input);
+                this.updateCounter(input);
+            });
+
+            // Validar al perder foco
+            input.addEventListener('blur', () => {
+                this.validateField(input);
+            });
+        });
+
+        // Validar al enviar formulario
+        form.addEventListener('submit', (e) => {
+            let isValid = true;
+            inputs.forEach(input => {
+                if (!this.validateField(input)) {
+                    isValid = false;
+                }
+            });
+
+            if (!isValid) {
+                e.preventDefault();
+                ToastSystem.show('Error en el formulario', 'Por favor corrige los errores antes de continuar', 'error');
+                
+                // Hacer scroll al primer error
+                const firstError = form.querySelector('.error');
+                if (firstError) {
+                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    firstError.focus();
+                }
+            }
+        });
+    }
+};
+
+// ==========================================
+// SISTEMA DE NOTIFICACIONES TOAST
+// ==========================================
+
+const ToastSystem = {
+    container: null,
+    
+    init() {
+        if (!this.container) {
+            this.container = document.createElement('div');
+            this.container.id = 'toastContainer';
+            document.body.appendChild(this.container);
+        }
+    },
+
+    show(title, message, type = 'info', duration = 4000) {
+        this.init();
+
+        const icons = {
+            success: '✅',
+            error: '❌',
+            warning: '⚠️',
+            info: 'ℹ️'
+        };
+
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `
+            <span class="toast-icon">${icons[type] || icons.info}</span>
+            <div class="toast-content">
+                <div class="toast-title">${title}</div>
+                <div class="toast-message">${message}</div>
+            </div>
+            <button class="toast-close">×</button>
+        `;
+
+        this.container.appendChild(toast);
+
+        // Mostrar con animación
+        setTimeout(() => toast.classList.add('show'), 10);
+
+        // Cerrar al hacer clic en X
+        const closeBtn = toast.querySelector('.toast-close');
+        closeBtn.addEventListener('click', () => this.hide(toast));
+
+        // Auto cerrar
+        if (duration > 0) {
+            setTimeout(() => this.hide(toast), duration);
+        }
+
+        return toast;
+    },
+
+    hide(toast) {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+    }
+};
+
+// ==========================================
+// SISTEMA DE CONFIRMACIÓN MODAL
+// ==========================================
+
+const ConfirmModal = {
+    modal: null,
+
+    init() {
+        if (!this.modal) {
+            this.modal = document.createElement('div');
+            this.modal.id = 'confirmModal';
+            this.modal.className = 'confirm-modal';
+            document.body.appendChild(this.modal);
+        }
+    },
+
+    show(options) {
+        this.init();
+
+        const {
+            title = '¿Estás seguro?',
+            message = 'Esta acción no se puede deshacer',
+            icon = '⚠️',
+            confirmText = 'Confirmar',
+            cancelText = 'Cancelar',
+            details = null,
+            onConfirm = () => {},
+            onCancel = () => {}
+        } = options;
+
+        let detailsHtml = '';
+        if (details && details.length > 0) {
+            detailsHtml = '<div class="confirm-details">';
+            details.forEach(detail => {
+                detailsHtml += `
+                    <div class="confirm-detail-item">
+                        <span class="confirm-detail-label">${detail.label}:</span>
+                        <span class="confirm-detail-value">${detail.value}</span>
+                    </div>
+                `;
+            });
+            detailsHtml += '</div>';
+        }
+
+        this.modal.innerHTML = `
+            <div class="confirm-content">
+                <div class="confirm-icon">${icon}</div>
+                <h3 class="confirm-title">${title}</h3>
+                <p class="confirm-message">${message}</p>
+                ${detailsHtml}
+                <div class="confirm-actions">
+                    <button class="confirm-btn confirm-btn-cancel">${cancelText}</button>
+                    <button class="confirm-btn confirm-btn-delete">${confirmText}</button>
+                </div>
+            </div>
+        `;
+
+        const cancelBtn = this.modal.querySelector('.confirm-btn-cancel');
+        const confirmBtn = this.modal.querySelector('.confirm-btn-delete');
+
+        cancelBtn.addEventListener('click', () => {
+            this.hide();
+            onCancel();
+        });
+
+        confirmBtn.addEventListener('click', () => {
+            this.hide();
+            onConfirm();
+        });
+
+        // Cerrar con ESC
+        const escHandler = (e) => {
+            if (e.key === 'Escape') {
+                this.hide();
+                onCancel();
+                document.removeEventListener('keydown', escHandler);
+            }
+        };
+        document.addEventListener('keydown', escHandler);
+
+        // Mostrar modal
+        setTimeout(() => this.modal.classList.add('show'), 10);
+    },
+
+    hide() {
+        this.modal.classList.remove('show');
+    }
+};
+
+// ==========================================
+// LOADING SPINNER
+// ==========================================
+
+const LoadingSpinner = {
+    spinner: null,
+
+    init() {
+        if (!this.spinner) {
+            this.spinner = document.createElement('div');
+            this.spinner.id = 'loadingSpinner';
+            this.spinner.className = 'loading-spinner';
+            this.spinner.innerHTML = `
+                <div class="spinner-content">
+                    <div class="spinner"></div>
+                    <div class="spinner-text">Procesando...</div>
+                </div>
+            `;
+            document.body.appendChild(this.spinner);
+        }
+    },
+
+    show(text = 'Procesando...') {
+        this.init();
+        this.spinner.querySelector('.spinner-text').textContent = text;
+        this.spinner.classList.add('show');
+    },
+
+    hide() {
+        if (this.spinner) {
+            this.spinner.classList.remove('show');
+        }
+    }
+};
+
+// ==========================================
+// CONFIRMACIONES DE ELIMINACIÓN MEJORADAS
+// ==========================================
+
+function setupDeleteConfirmations() {
+    // Para proyectos en tarjetas
+    document.querySelectorAll('form[action*="/eliminar/"]').forEach(form => {
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const card = form.closest('.card');
+            const nombreProyecto = card ? card.querySelector('h3').textContent.trim() : 'este proyecto';
+            const totalMedia = card ? card.querySelector('.media-count')?.textContent.trim() : '';
+            
+            ConfirmModal.show({
+                title: '⚠️ Eliminar Proyecto',
+                message: `¿Estás completamente seguro de eliminar "${nombreProyecto}"?`,
+                icon: '🗑️',
+                confirmText: 'Sí, Eliminar',
+                cancelText: 'Cancelar',
+                details: [
+                    { label: 'Proyecto', value: nombreProyecto },
+                    { label: 'Archivos', value: totalMedia || 'Desconocido' },
+                    { label: 'Acción', value: 'PERMANENTE' }
+                ],
+                onConfirm: () => {
+                    LoadingSpinner.show('Eliminando proyecto...');
+                    form.submit();
+                }
+            });
+        });
+    });
+
+    // Para eliminar media en editar
+    window.eliminarMedia = function(url) {
+        ConfirmModal.show({
+            title: '⚠️ Eliminar Archivo',
+            message: '¿Deseas eliminar este archivo multimedia?',
+            icon: '🗑️',
+            confirmText: 'Sí, Eliminar',
+            cancelText: 'Cancelar',
+            details: [
+                { label: 'Acción', value: 'Eliminación permanente' },
+                { label: 'Tipo', value: 'Archivo multimedia' }
+            ],
+            onConfirm: () => {
+                LoadingSpinner.show('Eliminando archivo...');
+                fetch(url, { method: 'POST' })
+                    .then(res => {
+                        if (res.ok) {
+                            ToastSystem.show('✅ Eliminado', 'Archivo eliminado correctamente', 'success');
+                            setTimeout(() => location.reload(), 1000);
+                        } else {
+                            LoadingSpinner.hide();
+                            ToastSystem.show('❌ Error', 'No se pudo eliminar el archivo', 'error');
+                        }
+                    })
+                    .catch(() => {
+                        LoadingSpinner.hide();
+                        ToastSystem.show('❌ Error', 'Error de conexión', 'error');
+                    });
+            }
+        });
+    };
+}
+
+// ==========================================
+// INICIALIZACIÓN AL CARGAR PÁGINA
+// ==========================================
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Inicializar validación en formularios
+    const agregarForm = document.querySelector('form[action*="/agregar"]');
+    const editarForm = document.getElementById('editar-form');
+    
+    if (agregarForm) {
+        // Asignar ID si no tiene
+        if (!agregarForm.id) {
+            agregarForm.id = 'agregar-form';
+        }
+        ValidationSystem.initForm(agregarForm.id);
+    }
+    
+    if (editarForm) {
+        ValidationSystem.initForm('editar-form');
+    }
+
+    // Setup confirmaciones de eliminación
+    setupDeleteConfirmations();
+
+    // Mensaje de bienvenida para admins
+    if (document.body.innerHTML.includes('Modo Administrador')) {
+        ToastSystem.show('👋 Bienvenido', 'Modo administrador activado', 'success', 3000);
+    }
+
+    console.log('✅ Sistema de validación inicializado');
+    if (agregarForm) console.log('✅ Formulario agregar encontrado y configurado');
+    if (editarForm) console.log('✅ Formulario editar encontrado y configurado');
+});
